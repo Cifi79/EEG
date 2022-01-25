@@ -21,7 +21,12 @@ namespace EEG
 
         private void pictureBox1_Paint(object sender, PaintEventArgs e)
         {
-            TheFace.Paint(e);
+            TheFace.Paint(pictureBox1.Size.Height,pictureBox1.Size.Width, e);
+        }
+
+        private void timer1_Tick(object sender, EventArgs e)
+        {
+            pictureBox1.Refresh();
         }
     }
 }

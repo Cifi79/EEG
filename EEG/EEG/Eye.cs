@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -26,10 +27,10 @@ namespace EEG
             set { _emotion = value; }
         }
 
-        internal void Paint(PaintEventArgs e)
+        internal void Paint(int height, int width, PaintEventArgs e)
         {
-            rightEye.Paint(e);
-            leftEye.Paint(e);
+            rightEye.Paint(height,width,e);
+            leftEye.Paint(height,width,e);
         }
 
         public FaceVModel()
@@ -44,7 +45,10 @@ namespace EEG
         public Emotions Emotion
         {
             get { return _emotion; }
-            set { _emotion = value; }
+            set {
+                _eyeModel.Emotion = value;
+                _emotion = value; 
+            }
         }
 
         private EyeModel _eyeModel;
@@ -57,9 +61,12 @@ namespace EEG
         /// <summary>
         /// Paint the eye
         /// </summary>
-        public void Paint(PaintEventArgs e)
+        public void Paint(int height, int width, PaintEventArgs e)
         {
-            
+            RectangleF _rect = new RectangleF(width * _eyeModel.Dimension.Left, height * _eyeModel.Dimension.Top, width * (_eyeModel.Dimension.Right- _eyeModel.Dimension.Left),height * (_eyeModel.Dimension.Bottom- _eyeModel.Dimension.Top));
+
+            SolidBrush blueBrush = new SolidBrush(System.Drawing.Color.FromArgb(_eyeModel.Color.R, _eyeModel.Color.G, _eyeModel.Color.B));
+            e.Graphics.FillRectangle(blueBrush, _rect);
         }
     }
 
