@@ -71,64 +71,48 @@ namespace EEG
 
         }
 
+        //-----------------------------------------------------------------------------------------------------------------------------------------------------------
+
         //Thanks to http://csharphelper.com/blog/2014/10/let-the-user-draw-polygons-in-c/ for this part of code
 
         // Each polygon is represented by a List.
         private List<List<Point>> Polygons = new List<List<Point>>();
         // See if the mouse is over a polygon's edge.
-        private bool MouseIsOverEdge(Point mouse_pt,
-            out List<Point> hit_polygon, out int hit_pt1,
-            out int hit_pt2, out Point closest_point)
+        private bool MouseIsOverEdge(Point mouse_pt, out List<Point> hit_polygon, out Point closest_point)
         {
-            // Examine each polygon.
-            // Examine them in reverse order to check those on top first.
-            for (int pgon = Polygons.Count - 1; pgon >= 0; pgon--)
+            foreach (var _poly in Polygons)
             {
-                var polygon = Polygons[pgon];
-
-                // See if we're over one of the polygon's segments.
-                for (int p1 = 0; p1 < polygon.Count; p1++)
+                foreach (var _point in _poly)
                 {
-                    // Get the index of the polygon's next point.
-                    int p2 = (p1 + 1) % polygon.Count;
-
-                    // See if we're over the segment between these points.
-                    PointF closest;
-                    if (FindDistanceToSegmentSquared(mouse_pt, polygon[p1], polygon[p2], out closest) < 10)
+                    if (FindDistancePoint(mouse_pt, _point) < 10)
                     {
                         // We're over this segment.
-                        hit_polygon = polygon;
-                        hit_pt1 = p1;
-                        hit_pt2 = p2;
-                        closest_point = Point.Round(closest);
+                        hit_polygon = _poly;
+                        closest_point = Point.Round(_point);
                         return true;
                     }
                 }
             }
-
             hit_polygon = null;
-            hit_pt1 = -1;
-            hit_pt2 = -1;
             closest_point = new Point(0, 0);
             return false;
         }
 
-        private int FindDistanceToSegmentSquared(Point mouse_pt, Point point1, Point point2, out PointF closest)
+        private int FindDistancePoint(Point mouse_pt, Point point)
         {
-            double dist1 = Math.Pow(mouse_pt.X - point1.X, 2) + Math.Pow(mouse_pt.Y - point1.Y, 2);
-            double dist2 = Math.Pow(mouse_pt.X - point2.X, 2) + Math.Pow(mouse_pt.Y - point2.Y, 2);
-
-            closest = (dist1 < dist2) ? point1 : point2;
-            return (int)((dist1 < dist2) ? dist1 : dist2);
+            return (int)(Math.Pow(mouse_pt.X - point.X, 2) + Math.Pow(mouse_pt.Y - point.Y, 2));
         }
 
         private void pictureBox1_MouseMove(object sender, MouseEventArgs e)
         {
 
-            if (MouseIsOverEdge(new Point(e.X,e.Y), out List<Point> hit_polygon, out int hit_point, out int hit_point2, out Point closest_point))
+            if (MouseIsOverEdge(new Point(e.X, e.Y), out List<Point> hit_polygon, out Point closest_point))
             {
-                
+                label1.Text = $"X: {closest_point.X} Y: {closest_point.Y}";
+                Cursor = Cursors.SizeAll;
             }
+            else
+                Cursor = Cursors.Default;
         }
     }
 }
